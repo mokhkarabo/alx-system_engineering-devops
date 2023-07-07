@@ -1,2 +1,2 @@
 #!/bin/bash
--m mkdir 751 my dir
+chmod -R ugo+X ./*
