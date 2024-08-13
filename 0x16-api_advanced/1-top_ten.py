@@ -21,17 +21,33 @@ def top_ten(subreddit):
         "limit": 10
     }
 
-    # Send a GET request to the subreddit's hot posts page
-    response = requests.get(url, headers=headers, params=params,
-                            allow_redirects=False)
+    try:
+        # Send a GET request to the subreddit's hot posts page
+        response = requests.get(url, headers=headers, params=params,
+                                allow_redirects=False)
 
-    # Check if the response status code indicates a not-found error (404)
-    if response.status_code == 404:
-        print("None")
-        return
+        # Check the response status code
+        if response.status_code != 200:
+            print("None")
+            return
 
-    # Parse the JSON response and extract the 'data' section
-    results = response.json().get("data")
+        # Parse the JSON response and extract the 'data' section
+        results = response.json().get("data", {})
 
-    # Print the titles of the top 10 hottest posts
-    [print(c.get("data").get("title")) for c in results.get("children")]
+        # Check if 'children' key exists in the response
+        children = results.get("children", [])
+        if not children:
+            print("None")
+            return
+
+        # Print the titles of the top 10 hottest posts
+        for c in children:
+            print(c.get("data", {}).get("title", "No Title"))
+
+    except requests.exceptions.RequestException as e:
+        print("An error occurred while fetching the subreddit data:", e)
+    except ValueError as e:
+        print("An error occurred while parsing the response:", e)
+
+# Example usage
+top_ten('python')
